@@ -7,7 +7,17 @@ public class GhostAI : MonoBehaviour
 
 	private Transform _pacman;
 
-	void Start()
+	public void StopMoving()
+	{
+		_ghostMove.CharacterMotor.enabled = false;
+	}
+
+	public void StartMoving()
+	{
+		_ghostMove.CharacterMotor.enabled = true;
+	}
+
+	void Awake()
 	{
 		_ghostMove = GetComponent<GhostMove>();
 		_ghostMove.OnUpdateMoveTarget += GhostMove_OnUpdateMoveTarget;
