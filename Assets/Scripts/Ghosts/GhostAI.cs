@@ -7,6 +7,11 @@ public class GhostAI : MonoBehaviour
 
 	private Transform _pacman;
 
+	public void Reset()
+	{
+		_ghostMove.CharacterMotor.ResetPosition();
+	}
+
 	public void StopMoving()
 	{
 		_ghostMove.CharacterMotor.enabled = false;
@@ -28,5 +33,13 @@ public class GhostAI : MonoBehaviour
 	private void GhostMove_OnUpdateMoveTarget()
 	{
 		_ghostMove.SetTargetMoveLocation(_pacman.position);
+	}
+
+	private void OnTriggerEnter2D(Collider2D other)
+	{
+		if (other.CompareTag("Player"))
+		{
+			other.GetComponent<Life>().RemoveLife();
+		}
 	}
 }

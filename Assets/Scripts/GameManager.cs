@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,17 +8,29 @@ public class GameManager : MonoBehaviour
 	{
 		Starting,
 		Playing,
+		LifeLost,
 		GameOver,
 		Victory
 	}
 
 	public float StartupTime;
 
+	public float LifeLostTimer;
+
 	private GhostAI[] _allGhosts;
 	private CharacterMotor _pacmanMotor;
 
 	private GameState _gameState;
 	private int _victoryCount;
+
+	private float _lifeLostTimer;
+
+	private bool _isGameOver;
+
+	public event Action OnGameStarted;
+	public event Action OnVictory;
+	public event Action OnGameOver;
+
 
 	void Start()
 	{
@@ -37,18 +50,33 @@ public class GameManager : MonoBehaviour
 
 		StopAllCharacters();
 
+		pacman.GetComponent<Life>().OnLifeRemoved += Pacman_OnLifeRemoved;
+
 		_gameState = GameState.Starting;
 	}
 
-	private void Collectable_OnCollected(int obj)
+	private void Pacman_OnLifeRemoved(int remainingLives)
+	{
+		StopAllCharacters();
+
+		_lifeLostTimer = LifeLostTimer;
+		_gameState = GameState.LifeLost;
+
+		_isGameOver = remainingLives <= 0;
+	}
+
+	private void Collectable_OnCollected(int _, Collectable collectable)
 	{
 		_victoryCount--;
 
 		if (_victoryCount <= 0)
 		{
 			_gameState = GameState.Victory;
-			Debug.Log("Victory!!");
+			StopAllCharacters();
+			OnVictory?.Invoke();
 		}
+
+		collectable.OnCollected -= Collectable_OnCollected;
 	}
 
 	private void Update()
@@ -63,10 +91,32 @@ public class GameManager : MonoBehaviour
 				{
 					_gameState = GameState.Playing;
 					StartAllCharacters();
+
+					OnGameStarted?.Invoke();
 				}
 
 				break;
 
+			case GameState.LifeLost:
+				_lifeLostTimer -= Time.deltaTime;
+
+				if (_lifeLostTimer <= 0)
+				{
+					if (_isGameOver)
+					{
+						_gameState = GameState.GameOver;
+						OnGameOver?.Invoke();
+					}
+					else
+					{
+						ResetAllCharacters();
+						_gameState = GameState.Playing;
+					}
+				}
+
+				break;
+
+			case GameState.GameOver:
 			case GameState.Victory:
 
 				if (Input.anyKey)
@@ -76,6 +126,17 @@ public class GameManager : MonoBehaviour
 
 				break;
 		}
+	}
+
+	private void ResetAllCharacters()
+	{
+		_pacmanMotor.ResetPosition();
+		foreach (var ghost in _allGhosts)
+		{
+			ghost.Reset();
+		}
+
+		StartAllCharacters();
 	}
 
 	private void StopAllCharacters()
