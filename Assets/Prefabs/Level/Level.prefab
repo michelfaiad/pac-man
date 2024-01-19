@@ -8109,6 +8109,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5646108625067177448}
   - component: {fileID: 4569447439198540355}
+  - component: {fileID: 31729164}
   m_Layer: 11
   m_Name: GhostHouse
   m_TagString: Untagged
@@ -8157,6 +8158,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &31729164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6415039793220623671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b9c5ba8b1fb5d04092c7f0087f16b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LeaveHouseInterval: 10
 --- !u!1 &6558950390571383186
 GameObject:
   m_ObjectHideFlags: 0
